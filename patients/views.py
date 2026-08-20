@@ -15,6 +15,6 @@ class PatientAppointmentsView(APIView):
         serializer = AppointmentSerializer(appointments, many=True)
         return Response(serializer.data)
 
-class PatientListView(generics.ListAPIView):
+class PatientListView(generics.ListCreateAPIView):
     queryset = Patient.objects.all()
     serializer_class = PatientSerializer

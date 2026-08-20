@@ -25,6 +25,10 @@ def generate_slots(doctor, date):
     if timezone.is_aware(start_dt):
         start_dt = timezone.make_aware(start_dt)
         end_dt = timezone.make_aware(end_dt)
+    else:
+        # If they're naive, make them aware using the default timezone
+        start_dt = timezone.make_aware(start_dt)
+        end_dt = timezone.make_aware(end_dt)
 
     slots = []
     current = start_dt
@@ -45,9 +49,9 @@ def get_available_slots(doctor_id, date):
     # Fetch already booked slots for that doctor and day
     day_start = datetime.combine(date, datetime.min.time())
     day_end = datetime.combine(date, datetime.max.time())
-    if timezone.is_aware(day_start):
-        day_start = timezone.make_aware(day_start)
-        day_end = timezone.make_aware(day_end)
+
+    day_start = timezone.make_aware(day_start)
+    day_end = timezone.make_aware(day_end)
 
     booked = Appointment.objects.filter(
         doctor=doctor,

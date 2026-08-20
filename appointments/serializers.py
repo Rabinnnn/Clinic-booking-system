@@ -4,11 +4,13 @@ from doctors.models import Doctor
 from patients.models import Patient
 
 class AppointmentSerializer(serializers.ModelSerializer):
+    patient_name = serializers.CharField(source='patient.name', read_only=True)
+    doctor_name = serializers.CharField(source='doctor.name', read_only=True)
+
     class Meta:
         model = Appointment
-        fields = ['id', 'doctor', 'patient', 'start_time', 'end_time', 'status', 'cancellation_reason', 'created_at']
-        read_only_fields = ['id', 'end_time', 'status', 'cancellation_reason', 'created_at']
-
+        fields = ['id', 'doctor', 'patient', 'start_time', 'end_time', 'status', 'cancellation_reason', 'created_at', 'patient_name', 'doctor_name']
+        read_only_fields = ['id', 'end_time', 'status', 'cancellation_reason', 'created_at', 'patient_name', 'doctor_name']
 
 class BookAppointmentSerializer(serializers.Serializer):
     doctor_id = serializers.IntegerField()

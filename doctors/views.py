@@ -1,5 +1,10 @@
+from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
+from appointments.models import Appointment
+from appointments.serializers import AppointmentSerializer
+
 from rest_framework import generics
 from datetime import datetime
 
@@ -32,3 +37,16 @@ class DoctorAvailabilityView(APIView):
 class DoctorListView(generics.ListAPIView):
     queryset = Doctor.objects.all()
     serializer_class = DoctorSerializer
+
+class DoctorAppointmentsView(APIView):
+    def get(self, request, id):
+        doctor = get_object_or_404(Doctor, id=id)
+        now = timezone.now()
+        appointments = Appointment.objects.filter(
+            doctor=doctor,
+            status='scheduled',
+            start_time__gte=now
+        ).order_by('start_time')
+        serializer = AppointmentSerializer(appointments, many=True)
+
+        return Response(serializer.data)
