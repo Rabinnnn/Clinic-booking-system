@@ -13,25 +13,37 @@ SLOT_DURATION = 30  # minutes
 MIN_ADVANCE = 60    # minutes (1 hour buffer)
 
 
+from datetime import datetime, timedelta, time   # add 'time' to imports
+
+def _to_time(value):
+    """Coerce str or time to a time object. Handles 24hr and 12hr formats."""
+    if isinstance(value, time):
+        return value
+    for fmt in ("%H:%M", "%H:%M:%S", "%I:%M %p", "%I:%M%p", "%I %p", "%I%p"):
+        try:
+            return datetime.strptime(str(value).strip().upper(), fmt).time()
+        except ValueError:
+            continue
+    raise ValueError(f"Unrecognised time format: {value!r}")
+
+
 def generate_slots(doctor, date):
-    """
-    Generate all available 30-min slots for a doctor on a given date.
-    Returns a list of (start_time, end_time) tuples (naive, but with date).
-    """
-    start_dt = datetime.combine(date, doctor.working_hours_start)
-    end_dt = datetime.combine(date, doctor.working_hours_end)
+    GLOBAL_START = time(8, 0)
+    GLOBAL_END   = time(17, 0)
 
-    # Make timezone-aware if USE_TZ=True
-    if timezone.is_aware(start_dt):
-        start_dt = timezone.make_aware(start_dt)
-        end_dt = timezone.make_aware(end_dt)
-    else:
-        # If they're naive, make them aware using the default timezone
-        start_dt = timezone.make_aware(start_dt)
-        end_dt = timezone.make_aware(end_dt)
+    start_dt = datetime.combine(date, _to_time(doctor.working_hours_start))
+    end_dt   = datetime.combine(date, _to_time(doctor.working_hours_end))
 
-    slots = []
-    current = start_dt
+    start_dt = max(start_dt, datetime.combine(date, GLOBAL_START))
+    end_dt   = min(end_dt,   datetime.combine(date, GLOBAL_END))
+
+    if start_dt >= end_dt:
+        return []
+
+    start_dt = timezone.make_aware(start_dt) if not timezone.is_aware(start_dt) else start_dt
+    end_dt   = timezone.make_aware(end_dt)   if not timezone.is_aware(end_dt)   else end_dt
+
+    slots, current = [], start_dt
     while current < end_dt:
         slots.append((current, current + timedelta(minutes=SLOT_DURATION)))
         current += timedelta(minutes=SLOT_DURATION)
