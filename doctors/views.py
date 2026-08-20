@@ -1,9 +1,12 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import generics
 from datetime import datetime
 
 from appointments.services import get_available_slots
 from appointments.serializers import AvailabilitySlotSerializer
+from doctors.models import Doctor
+from doctors.serializers import DoctorSerializer
 
 
 class DoctorAvailabilityView(APIView):
@@ -25,3 +28,7 @@ class DoctorAvailabilityView(APIView):
         slots = get_available_slots(id, date)
         serializer = AvailabilitySlotSerializer(slots, many=True)
         return Response({'slots': serializer.data})
+
+class DoctorListView(generics.ListAPIView):
+    queryset = Doctor.objects.all()
+    serializer_class = DoctorSerializer
