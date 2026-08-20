@@ -163,6 +163,30 @@
                 </div>
             </div>
         </div>
+                <!-- Authentication Modal (Doctor Access) -->
+        <div class="modal fade" id="authModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="fas fa-user-md me-2"></i>Doctor Authentication</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Please enter your registration number to access the Doctor View.</p>
+                        <div class="mb-3">
+                            <label for="authRegNumber" class="form-label">Registration Number</label>
+                            <input type="password" id="authRegNumber" class="form-control" placeholder="Enter registration number">
+                        </div>
+                        <div id="authError" class="alert alert-danger d-none">Invalid registration number. Please try again.</div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" id="authSubmitBtn" class="btn btn-primary">Authenticate</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> <!-- end container -->
     </div>
 
     <!-- Bootstrap JS + Popper -->
