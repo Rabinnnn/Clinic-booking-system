@@ -39,17 +39,11 @@ def generate_slots(doctor, date):
 
 
 def get_available_slots(doctor_id, date):
-    """
-    Return list of free slots for a given doctor on a given date.
-    Each slot: {'start': ISO datetime, 'end': ISO datetime}
-    """
     doctor = get_object_or_404(Doctor, id=doctor_id)
     all_slots = generate_slots(doctor, date)
 
-    # Fetch already booked slots for that doctor and day
     day_start = datetime.combine(date, datetime.min.time())
     day_end = datetime.combine(date, datetime.max.time())
-
     day_start = timezone.make_aware(day_start)
     day_end = timezone.make_aware(day_end)
 
@@ -61,16 +55,22 @@ def get_available_slots(doctor_id, date):
     ).values_list('start_time', flat=True)
 
     booked_set = set(booked)
+    now = timezone.now()
+    min_advance = timedelta(minutes=MIN_ADVANCE)
 
     available = []
     for start, end in all_slots:
-        if start not in booked_set:
-            available.append({
-                'start': start.isoformat(),
-                'end': end.isoformat()
-            })
+        # Skip if already booked
+        if start in booked_set:
+            continue
+        # Skip if within 1 hour of now (or in the past)
+        if start < now + min_advance:
+            continue
+        available.append({
+            'start': start.isoformat(),
+            'end': end.isoformat()
+        })
     return available
-
 
 def validate_slot(doctor, start_time, patient=None, check_advance=True):
     """
