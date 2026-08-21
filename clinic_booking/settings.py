@@ -81,7 +81,7 @@ REST_FRAMEWORK = {
     ],
 }
 
-# CORS – allow all for development (restrict later)
+
 CORS_ALLOW_ALL_ORIGINS = True
 
 # Static files
